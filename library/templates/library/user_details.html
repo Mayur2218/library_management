@@ -1,0 +1,28 @@
+{% extends "library/base.html" %}
+{% block content %}
+<h2>User Details</h2>
+{% if users %}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Student Name</th>
+        <th scope="col">Department</th>
+        <th scope="col">Enrollment Number</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ user.full_name }}</td>
+        <td>{{ user.department }}</td>
+        <td>{{ user.enrollment_no }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+<p>users data are not available</p>
+{% endif %}
+{% endblock %}

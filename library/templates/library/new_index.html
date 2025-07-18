@@ -1,0 +1,48 @@
+{% extends "library/base.html" %}
+{% load static %}
+{% block content %}
+<!-- Header-->
+<header class="hero-header text-white d-flex align-items-center" style="background-image: url('{% static 'img/library_books.jpg' %}');">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center">
+            <h1 class="display-4 fw-bolder">The Story Spinner</h1>
+            <p class="lead fw-normal text-white-50 mb-0">A place where stories come alive</p>
+        </div>
+    </div>
+</header>
+
+<!-- Section-->
+<section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            {% for book in books %}
+                <div class="col mb-5">
+                    <div class="card h-100">
+                        <!-- Book image -->
+                        <img class="card-img-top" src="{{ book.cover.url }}" alt="{{ book.title }}" />
+                        <!-- Book details -->
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <h5 class="fw-bolder">{{ book.title }}</h5>
+                                <p>{{ book.author }}</p>
+                                <p class="text-muted small">Available: {{ book.available_copies }}</p>
+                            </div>
+                        </div>
+                        <!-- Actions -->
+                        <div class="card-footer p-2 pt-0 border-top-0 bg-transparent">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto me-2" href="{% url 'issue_book' %}">Read</a>
+                                <a class="btn btn-outline-success" href="{% url 'buy_book' book.id %}">Add Cart</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center">No books available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<!-- Core theme JS-->
+<script src="{% static 'js/scripts.js' %}"></script>
+{% endblock %}

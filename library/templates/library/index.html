@@ -1,0 +1,58 @@
+{% extends "library/base.html" %}
+{% block content %}
+<h2>Library Book</h2>
+{% if books %}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Book Name</th>
+        <th scope="col">Author</th>
+        <th scope="col">Total Copies</th>
+        <th scope="col">Available Copies</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for book in books %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.total_copies }}</td>
+        <td>{{ book.available_copies }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+<p>Books data are not available</p>
+{% endif %}
+
+<h2 class="mt-4">Issue Book Record</h2>
+{% if issues %}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Borrower Name</th>
+        <th scope="col">Book</th>
+        <th scope="col">Issue Date</th>
+        <th scope="col">Return</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for book in issues %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ book.full_name.capitalize }}</td>
+        <td>{{ book.book_id }}</td>
+        <td>{{ book.issue_date }}</td>
+        <td>{{ book.return_date }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+<p><strong>Issue data are not available</strong></p>
+{% endif %}
+{% endblock %}

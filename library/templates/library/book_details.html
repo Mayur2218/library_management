@@ -1,0 +1,59 @@
+{% extends "library/base.html" %}
+{% load static %}
+{% block content %}
+<h2>All Books</h2>
+{% if books %}
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+          <th scope="col">#</th>
+          <th scope="col">Book Name</th>
+          <th scope="col">Author</th>
+          <th scope="col">Total Copies</th>
+          <th scope="col">Available Copies</th>
+          <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for book in books %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.total_copies }}</td>
+        <td>{{ book.available_copies }}</td>
+        <td>
+            <a href="{% url 'update_book' book.id %}" class="btn btn-success me-2">Edit</a>
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#confirmModal{{ book.id }}">
+              Remove
+            </button>
+            <!-- Modal -->
+            <div class="modal fade" id="confirmModal{{ book.id }}" tabindex="-1" aria-labelledby="modalLabel{{ book.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="modalLabel{{ book.id }}">Confirm Remove</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to delete <strong>{{ book.title }}</strong>?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="{% url 'remove_book' book.id %}" class="btn btn-danger">Delete</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+<p>Books data are not available</p>
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "library/base.html" %}
+{% block content %}
+<style>
+body {
+    background-color: #f2f4f8;
+}
+
+.book-wrapper {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-card {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1000px;
+}
+
+.form-card h2 {
+    font-weight: bold;
+    color: #343a40;
+}
+
+.btn-custom {
+    width: 120px;
+}
+</style>
+<div class="book-wrapper">
+    <div class="form-card">
+        <h2 class="text-center mb-4">Add book</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex justify-content-start mt-4">
+                <input type="submit" class="btn btn-success btn-custom me-2" value="Add book">
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
