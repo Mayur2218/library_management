@@ -11,7 +11,7 @@ class CustomUserAdmin(BaseUseAdmin):
     list_filter = ['is_admin']
     fieldsets = [
         (None, {"fields": ['email', 'password']}),
-        ("Personal info", {"fields": ['name', 'phone_number', 'date_of_birth', 'user_type', 'date_joined']}),
+        ("Personal info", {"fields": ['name', 'phone_number', 'date_of_birth', 'user_type']}),
         ("Permissions", {"fields": ("is_admin", "is_superuser", "is_active", "groups", "user_permissions")}),
     ]
     add_fieldsets = [
@@ -33,12 +33,11 @@ class BookView(admin.ModelAdmin):
     ordering = ['title']
 
 class IssueView(admin.ModelAdmin):
-    list_display = ['student','book_id','issue_date','status']
+    list_display = ['customer','book_id','issue_date','status']
     search_fields = ['book_id']
 
 admin.site.register(Book, BookView)
 admin.site.register(Issue, IssueView)
-admin.site.register(Customer)
 admin.site.register(Cart)
 admin.site.register(CartItem)
 admin.site.register(Transection)

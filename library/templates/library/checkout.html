@@ -1,0 +1,42 @@
+{% extends "library/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container">
+<h2>Checkout Books</h2>
+{% if items %}
+  <table class="table table-bordered table-secondary table-hover rounded">
+    <thead class="table-dark">
+      <tr>
+          <th scope="col">#</th>
+          <th scope="col">Customer Name</th>
+          <th scope="col">Phone Number</th>
+          <th scope="col">Book</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Total Price</th>
+          <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ item.customer }}</td>
+        <td>+91 {{ item.customer.phone_number }}</td>
+        <td>{{ item.book }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>₹ {{ item.total_price }}</td>
+        <td>
+          <a class="btn btn-success btn-sm me-2" href="{% url 'issue_book' %}">Issue</a>
+        </td>
+        {% comment " " %}
+        <td>{{ book.available_copies }}</td>
+        {% endcomment %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+<p>Nothing any item to checkout items</p>
+{% endif %}
+</div>
+{% endblock %}

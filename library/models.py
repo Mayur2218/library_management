@@ -38,7 +38,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     user_type = models.CharField(max_length=15, choices=[('admin','Admin'), ('customer', 'Customer')], default='customer')
-    date_joined = models.DateField(null=True)
+    date_joined = models.DateField(default=timezone.now)
 
     objects = CustomUserModel()
     USERNAME_FIELD = 'email'
@@ -54,14 +54,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return self.is_admin
 
-class Customer(models.Model):
-    user = models.OneToOneField(MyUser, on_delete=models.CASCADE, null=True)
-    address = models.CharField()
-    create_at = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return self.user.name
-
 class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.CharField(max_length=255)
@@ -75,32 +67,35 @@ class Book(models.Model):
         return self.title
 
 class Issue(models.Model):
-    student = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(MyUser, on_delete=models.CASCADE, default=None)
     book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
     issue_date = models.DateField(default=timezone.now)
     return_book = models.DateField()
     status = models.CharField(max_length=20, choices=[('Issued', 'Issued'), ('Returned', 'Returned')], default='Issued')
 
     def __str__(self):
-        return f"{self.student.user.name}"
+        return f"{self.customer.name}"
+
 class Cart(models.Model):
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
+    customer = models.OneToOneField(MyUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class CartItem(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
+    def __str__(self):
+        return f"{self.customer} - {self.book} x {self.quantity}"
 class Transection(models.Model):
-    customer = models.ForeignKey (Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey (MyUser, on_delete=models.CASCADE)
     book = models.ForeignKey (Book, on_delete=models.CASCADE)
     amount = models.DecimalField(decimal_places=2, max_digits=6)
     transection_type = models.CharField(max_length=20, choices=[('purchase','Purchase'),('issue','Issue')])
     transection_date = models.DateTimeField(auto_now_add=True)
 
 class Notification(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

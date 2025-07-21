@@ -135,5 +135,6 @@ MESSAGE_TAGS = {
     messages.INFO: 'info',
     messages.DEBUG: 'primary',
 }
-LOGIN_URL = '/login/'
+LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/login/'

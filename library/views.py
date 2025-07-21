@@ -3,24 +3,35 @@ from .forms import *
 from .models import *
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import logout as django_logout
+from django.core.paginator import Paginator
 
+def admin_dashboard(user):
+    return user.is_superuser or user.is_staff
 """Navbar view and dashboard"""
 @login_required
 def about(request):
     return render(request, 'library/about.html')
 @login_required
 def dashboard(request):
+    total_item = CartItem.objects.filter(customer=request.user).count()
     title = request.GET.get ('search', '')
     if title:
         books = Book.objects.filter (title__icontains=title).all ()
+        paginator =  Paginator(books, 4)
+        page_per = request.GET.get('page')
+        books = paginator.get_page(page_per)
         if not books:
             messages.error (request, f"Search book are not available")
             return redirect ('dashboard')
     else:
         books = Book.objects.all ()
-    return render(request, 'library/new_index.html', {"books":books,"search":title})
+        paginator =  Paginator(books, 4)
+        page_per = request.GET.get('page')
+        books = paginator.get_page(page_per)
+
+    return render(request, 'library/new_index.html', {"books":books,"search":title, "total_item":total_item})
 
 """Authentication
 Create User only register not login like(student only use library benefits not access they data) """
@@ -28,11 +39,16 @@ class AdminOnlyLoginView(LoginView):
     form_class = LoginForm
     template_name = 'library/login.html'
     def form_valid(self, form):
+        response = super().form_valid(form)
         user = form.get_user()
-        if not(user.is_superuser or user.is_staff or user.is_active):
-            messages.error(self.request,'Only admin can login')
+        if not user.is_active:
+            messages.error(self.request, "Your account is not active. Please contact support")
             return redirect('login')
-        return super().form_valid(form)
+        if user.user_type == 'customer':
+            return redirect('dashboard')
+        elif user.is_superuser or user.is_staff:
+            return redirect('dashboard')
+        return response
 
 def customer_register(request):
     if request.method == "POST":
@@ -52,32 +68,24 @@ def customer_register(request):
         form = CustomerRegistrationForm()
     return render(request, 'library/register.html', {'form': form})
 
-def create_student(request):
-    if request.method == 'POST':
-        form = NewStudentForm(request.POST)
-        if form.is_valid():
-            new_user = form.save(commit=False)
-            enrollment = form.cleaned_data['enrollment_no']
-            users = Customer.objects.filter(enrollment_no=enrollment).exists()
-            if not users:
-                new_user.save()
-                return redirect('dashboard')
-            else:
-                messages.error(request, "Enrollment Number are already exists!")
-    else:
-            form = NewStudentForm()
-    return render(request, 'library/register.html',{"form":form})
 @login_required
 def logout(request):
     django_logout(request)
-    messages.success(request, "You have been logged out.")
     return redirect('login')
 
-"""CRUD (Add/ Issue/ Return Book)"""
+""" CRUD(Add/ Issue/ Return Book) """
 @login_required
 def book_details(request):
-    books = Book.objects.all()
-    return render(request, 'library/book_details.html', {"books":books})
+    title = request.GET.get('search','')
+    if title:
+        books = Book.objects.filter(title__icontains=title).all()
+        if not books:
+            messages.error (request, f"Search book are not available")
+            return redirect ('book_details')
+    else:
+        books = Book.objects.all ()
+    return render(request, 'library/book_details.html', {"books":books, "search":title})
+@user_passes_test(admin_dashboard)
 @login_required
 def add_book(request):
     if request.method == 'POST':
@@ -91,6 +99,7 @@ def add_book(request):
     else:
         form = AddBookForm()
     return render(request, 'library/add_book.html', {"form":form})
+@user_passes_test(admin_dashboard)
 @login_required
 def update_book(request, book_id):
     books = get_object_or_404(Book, pk=book_id)
@@ -103,6 +112,7 @@ def update_book(request, book_id):
     else:
         form = AddBookForm(instance=books)
     return render(request, 'library/add_book.html',{"form":form})
+@user_passes_test(admin_dashboard)
 @login_required
 def remove_book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
@@ -134,9 +144,28 @@ def buy_book(request, book_id):
     return render(request, 'library/buy_book.html', {"books":books})
 @login_required
 def user_details(request):
-    users = Customer.objects.all ()
+    users = MyUser.objects.filter(user_type='customer').all ()
     return render(request, 'library/user_details.html', {'users':users})
 
+"""Cart data Checkout"""
 @login_required
-def read_book(request):
-    pass
+def add_to_cart(request):
+    if request.method == 'POST':
+        book = request.POST.get('book_id')
+        quantity = request.POST.get('quantity')
+        if book and quantity:
+            book = get_object_or_404(Book, pk=book)
+            quantity = int(quantity)
+            cart_item, created = CartItem.objects.get_or_create(
+                customer=request.user, book=book, defaults={'quantity':quantity})
+            if not created:
+                cart_item.quantity += quantity
+                cart_item.save()
+    return redirect('dashboard')
+
+@login_required
+def checkout(request):
+    items = CartItem.objects.filter(customer=request.user)
+    for item in items:
+        item.total_price = item.quantity * item.book.price
+    return render(request, 'library/checkout.html',{"items":items})

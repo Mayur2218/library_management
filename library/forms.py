@@ -31,12 +31,12 @@ class CustomUserChangeForm(forms.ModelForm):
         fields = ["name", "email", "password", "phone_number", "date_of_birth", "is_active", "is_admin", "is_superuser"]
 
 class CustomerRegistrationForm(forms.Form):
-    name = forms.CharField(max_length=100)
-    email = forms.EmailField()
-    phone_number = forms.CharField(max_length=15)
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Enter your name'}))
+    email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Enter your email ID'}))
+    phone_number = forms.CharField(max_length=15, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Enter Phone Number'}))
+    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date','class':'form-control', 'placeholder':'Enter Date of Birth'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Enter Paasword'}))
+    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Confirm Password'}))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -45,7 +45,6 @@ class CustomerRegistrationForm(forms.Form):
         if password != confirm:
             raise forms.ValidationError("Passwords do not match")
         return cleaned_data
-
 
 class AddBookForm(forms.ModelForm):
     class Meta:
@@ -65,22 +64,11 @@ class IssueBookForm(forms.ModelForm):
     book = forms.ModelChoiceField(queryset=Book.objects.all(), empty_label='Select Book',widget=forms.Select(attrs={'class':'form-select'}))
     class Meta:
         model = Issue
-        fields = '__all__'
+        fields = ['issue_date','return_book','status']
         widgets = {
-            'first_name': forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Enter your first name'}),
-            'last_name': forms.TextInput (attrs={'class': 'form-control', 'placeholder': 'Enter your last name'}),
-            'return_book': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'Enter return date'}),
-        }
-
-class NewStudentForm(forms.ModelForm):
-    class Meta:
-        model = Customer
-        fields = '__all__'
-        widgets = {
-            'full_name': forms.TextInput (attrs={'class': 'form-control', 'placeholder': 'Enter your fullname'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your EmailId'}),
-            'phone_number': forms.NumberInput (attrs={'class': 'form-control', 'placeholder': 'Enter your phone number'}),
-            'address': forms.Textarea (attrs={'class': 'form-control', 'placeholder': 'Enter your current address', 'row':2}),
+            'issue_date': forms.DateInput(attrs={'type':'date','class': 'form-control'}),
+            'return_book': forms.DateInput(attrs={'type':'date','class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
         }
 
 class LoginForm(AuthenticationForm):
@@ -88,6 +76,3 @@ class LoginForm(AuthenticationForm):
         super().__init__(request=request, *args, **kwargs)
     username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Enter email','autocomplete':'off'}))
     password = forms.CharField(max_length=150, widget=forms.PasswordInput(attrs={'class':'form-control','placeholder':'Enter Password','autocomplete':'off'}))
-    def confirm_login_allowed(self, user):
-        if not(user.is_superuser or user.is_staff):
-            raise forms.ValidationError("Only admin users can login!", code="invalid_login")

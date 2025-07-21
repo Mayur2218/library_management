@@ -10,39 +10,92 @@
         </div>
     </div>
 </header>
-
+<!-- Section Title -->
+<div class="bg-light py-4 border-bottom shadow-sm">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-2">📚 Explore Our Book Collection</h2>
+        <p class="text-muted mb-0">Browse a wide range of genres and authors</p>
+    </div>
+</div>
 <!-- Section-->
+<!-- Book Listing Section -->
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-            {% for book in books %}
-                <div class="col mb-5">
-                    <div class="card h-100">
-                        <!-- Book image -->
-                        <img class="card-img-top" src="{{ book.cover.url }}" alt="{{ book.title }}" />
-                        <!-- Book details -->
-                        <div class="card-body p-4">
-                            <div class="text-center">
-                                <h5 class="fw-bolder">{{ book.title }}</h5>
-                                <p>{{ book.author }}</p>
-                                <p class="text-muted small">Available: {{ book.available_copies }}</p>
-                            </div>
-                        </div>
-                        <!-- Actions -->
-                        <div class="card-footer p-2 pt-0 border-top-0 bg-transparent">
-                            <div class="text-center">
-                                <a class="btn btn-outline-dark mt-auto me-2" href="{% url 'issue_book' %}">Read</a>
-                                <a class="btn btn-outline-success" href="{% url 'buy_book' book.id %}">Add Cart</a>
-                            </div>
-                        </div>
-                    </div>
+        {% for book in books %}
+            <div class="row align-items-center mb-4 border-bottom pb-3">
+                <!-- Book Image -->
+                <div class="col-md-2 text-center">
+                    {% if book.cover %}
+                        <img src="{{ book.cover.url }}" alt="{{ book.title }}" class="img-fluid rounded shadow-sm" style="max-height:200px; width:250px;" />
+                    {% else %}
+                        <img src="{% static 'img/default_cover.jpg' %}" alt="No Cover" class="img-fluid rounded shadow-sm" style="max-height:200px; width:250px;" />
+                    {% endif %}
                 </div>
-            {% empty %}
-                <p class="text-center">No books available at the moment.</p>
-            {% endfor %}
-        </div>
+
+                <!-- Book Info -->
+                <div class="col-md-6">
+                    <h5 class="fw-bold mb-1">{{ book.title }}</h5>
+                    <p class="mb-0">by {{ book.author }}</p>
+
+                    {% if book.description %}
+                        <p class="text-muted small mt-2">{{ book.description }}</p>
+                    {% else %}
+                        <p class="text-muted small mt-2 fst-italic">No description available.</p>
+                    {% endif %}
+
+                    {% if book.price %}
+                        <p class="text-success fw-semibold">₹{{ book.price }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Availability -->
+                <div class="col-md-2 text-center">
+                    <span class="badge bg-secondary">Available: {{ book.available_copies }}</span>
+                </div>
+
+                <!-- Actions -->
+                <div class="col-md-2 text-end">
+                    <a class="btn btn-outline-dark mb-1" style="width:120px;" href="{% url 'issue_book' %}">Read</a>
+                    <a class="btn btn-outline-success" style="width:120px;" href="{% url 'buy_book' book.id %}">Add Cart</a>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center text-muted">No books available at the moment.</p>
+        {% endfor %}
     </div>
 </section>
+
+<!-- Pagination Controls -->
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+    {% if books.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ books.previous_page_number }}" aria-label="Previous">
+                <span aria-hidden="true">Previous</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
+    {% for num in books.paginator.page_range %}
+        {% if books.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% elif num > books.number|add:'-3' and num < books.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+    {% endfor %}
+    {% if books.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ books.next_page_number }}" aria-label="Next">
+                <span aria-hidden="true">Next</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+    </ul>
+</nav>
+<!--end pagination-->
 <!-- Core theme JS-->
 <script src="{% static 'js/scripts.js' %}"></script>
 {% endblock %}
