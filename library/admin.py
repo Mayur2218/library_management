@@ -38,7 +38,6 @@ class IssueView(admin.ModelAdmin):
 
 admin.site.register(Book, BookView)
 admin.site.register(Issue, IssueView)
-admin.site.register(Cart)
 admin.site.register(CartItem)
 admin.site.register(Transection)
 admin.site.register(Notification)

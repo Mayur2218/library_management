@@ -63,7 +63,7 @@ def customer_register(request):
             )
             user.set_password(form.cleaned_data['password'])
             user.save()
-            return redirect('login')  # redirect to login or dashboard
+            return redirect('login')  # redirect to 'login' or dashboard
     else:
         form = CustomerRegistrationForm()
     return render(request, 'library/register.html', {'form': form})
@@ -128,6 +128,10 @@ def issue_book(request):
         if form.is_valid():
             issue = form.save(commit=False)
             book = form.cleaned_data["book"]
+            books = Book.objects.get(pk=book.id)
+            issue.book_id = books
+            customer = MyUser.objects.get(name=request.user)
+            issue.customer = customer
             if book.available_copies > 0:
                 book.available_copies -= 1
                 book.save()
@@ -146,6 +150,10 @@ def buy_book(request, book_id):
 def user_details(request):
     users = MyUser.objects.filter(user_type='customer').all ()
     return render(request, 'library/user_details.html', {'users':users})
+@login_required
+def issue_books(request):
+    issues = Issue.objects.filter(customer=request.user).all ()
+    return render(request, 'library/issue_books.html', {'issues':issues})
 
 """Cart data Checkout"""
 @login_required

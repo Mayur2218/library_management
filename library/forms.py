@@ -66,7 +66,7 @@ class IssueBookForm(forms.ModelForm):
         model = Issue
         fields = ['issue_date','return_book','status']
         widgets = {
-            'issue_date': forms.DateInput(attrs={'type':'date','class': 'form-control'}),
+            'issue_date': forms.DateInput(attrs={'type':'date','class': 'form-control','autocomplete':'off'}),
             'return_book': forms.DateInput(attrs={'type':'date','class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
         }

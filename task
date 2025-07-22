@@ -1,32 +1,23 @@
 +-----------------+
-|     User        |<-------------------+
-+-----------------+                    |
-| id              |                    |
-| username        |                    |
-| email           |                    |
-| password        |                    |
-| is_staff        |                    |
-| is_superuser    |                    |
-+-----------------+                    |
-         ▲                             |
-         |                             |
-+---------------------+       +-------------------+
-|    Customer         |       |      Admin        |
-+---------------------+       +-------------------+
-| user_id (FK)        |       | user_id (FK)       |
-| phone_number        |       +-------------------+
-| address             |
-+---------------------+
+|     User        |
++-----------------+
+| id              |
+| name            |
+| email           |
+| phone_number    |
+| date_of_birth   |
+| password        |
+| user_type       |
+| is_active       |
+| is_staff        |
+| is_superuser    |
+| date_joined     |
++-----------------+
+         ▲
+         |
          |
          |
          v
-+---------------------+
-|     Cart            |
-+---------------------+
-| id                  |
-| customer_id (FK)    |
-| total_price         |
-+---------------------+
 
 +---------------------+
 |     Book            |
@@ -34,16 +25,31 @@
 | id                  |
 | title               |
 | author              |
+| cover               |
+| description         |
+| total_copies        |
 | price               |
 | available_copies    |
++---------------------+
+
+
++---------------------+
+|     Issue           |
++---------------------+
+| id                  |
+| customer(FK)        |
+| book_id (Fk)        |
+| issue_date          |
+| return_book         |
+| status              |
 +---------------------+
 
 +--------------------------+
 |   CartItem               |
 +--------------------------+
 | id                       |
-| cart_id (FK)             |
-| book_id (FK)             |
+| customer (FK)            |
+| book (FK)                |
 | quantity                 |
 +--------------------------+
 
@@ -51,10 +57,10 @@
 |   Transaction            |
 +--------------------------+
 | id                       |
-| customer_id (FK)         |
-| book_id (FK)             |
-| transaction_type (BUY/ISSUE/RETURN) |
-| date                     |
+| customer(FK)             |
+| book (FK)                |
+| transaction_type         | (BUY/ISSUE/RETURN)
+| transection_date         |
 | amount                   |
 +--------------------------+
 
@@ -62,7 +68,7 @@
 |    Notification          |
 +--------------------------+
 | id                       |
-| customer_id (FK)         |
+| customer (FK)            |
 | message                  |
 | is_read                  |
 | created_at               |

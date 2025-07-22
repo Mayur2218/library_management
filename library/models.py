@@ -55,6 +55,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         return self.is_admin
 
 class Book(models.Model):
+    objects = models.Manager()
     title = models.CharField(max_length=100)
     author = models.CharField(max_length=255)
     cover = models.ImageField(upload_to='cover_images/', blank=True)
@@ -67,6 +68,7 @@ class Book(models.Model):
         return self.title
 
 class Issue(models.Model):
+    objects = models.Manager()
     customer = models.ForeignKey(MyUser, on_delete=models.CASCADE, default=None)
     book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
     issue_date = models.DateField(default=timezone.now)
@@ -76,11 +78,8 @@ class Issue(models.Model):
     def __str__(self):
         return f"{self.customer.name}"
 
-class Cart(models.Model):
-    customer = models.OneToOneField(MyUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
 class CartItem(models.Model):
+    objects = models.Manager()
     customer = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
